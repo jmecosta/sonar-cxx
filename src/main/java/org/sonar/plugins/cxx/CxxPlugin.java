@@ -80,10 +80,31 @@ import org.sonar.plugins.cxx.xunit.CxxXunitSensor;
     @Property(
       key = CxxCoverageSensor.REPORT_PATH_KEY,
       defaultValue = "",
-      name = "Path to gcovr report(s)",
+      name = "Path to coverage report(s)",
       description = "Relative to projects' root. Ant patterns are accepted",
       global = false,
       project = true),
+    @Property(
+      key = CxxCoverageSensor.SYSTEM_REPORT_PATH_KEY,
+      defaultValue = "",
+      name = "Path to system coverage report(s)",
+      description = "Relative to projects' root. Ant patterns are accepted",
+      global = false,
+      project = true),
+    @Property(
+      key = CxxCoverageSensor.IT_REPORT_PATH_KEY,
+      defaultValue = "",
+      name = "Path to integration coverage report(s)",
+      description = "Relative to projects' root. Ant patterns are accepted",
+      global = false,
+      project = true),
+    @Property(
+      key = CxxCoverageSensor.OVERALL_REPORT_PATH_KEY,
+      defaultValue = "",
+      name = "Path to overall coverage report(s)",
+      description = "Relative to projects' root. Ant patterns are accepted",
+      global = false,
+      project = true),        
     @Property(
       key = CxxRatsSensor.REPORT_PATH_KEY,
       defaultValue = "",

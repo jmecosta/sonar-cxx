@@ -42,13 +42,16 @@ public class CxxCoverageSensor extends CxxReportSensor {
 
   private static final int UNIT_TEST_COVERAGE = 0;
   public static final int IT_TEST_COVERAGE = 1;
-  public static final int OVERALL_TEST_COVERAGE = 2;
+  public static final int SYSTEM_TEST_COVERAGE = 2;
+  public static final int OVERALL_TEST_COVERAGE = 3;
   
   public static final String REPORT_PATH_KEY = "sonar.cxx.coverage.reportPath";
   public static final String IT_REPORT_PATH_KEY = "sonar.cxx.coverage.itReportPath";
+  public static final String SYSTEM_REPORT_PATH_KEY = "sonar.cxx.coverage.systemReportPath";  
   public static final String OVERALL_REPORT_PATH_KEY = "sonar.cxx.coverage.overallReportPath";
   private static final String DEFAULT_REPORT_PATH = "coverage-reports/coverage-*.xml";
   private static final String IT_DEFAULT_REPORT_PATH = "coverage-reports/it-coverage-*.xml";
+  private static final String SYSTEM_DEFAULT_REPORT_PATH = "coverage-reports/system-coverage-*.xml";  
   private static final String OVERALL_DEFAULT_REPORT_PATH = "coverage-reports/overall-coverage-*.xml";
   
   private final Settings settings;
@@ -80,6 +83,12 @@ public class CxxCoverageSensor extends CxxReportSensor {
     Map<String, CoverageMeasuresBuilder> itCoverageMeasures = parseReports(itReports);
     saveMeasures(project, context, itCoverageMeasures, IT_TEST_COVERAGE);
 
+    CxxUtils.LOG.debug("Parsing system test coverage reports");
+    List<File> systemReports = getReports(settings, project.getFileSystem().getBasedir().getPath(),
+            SYSTEM_REPORT_PATH_KEY, SYSTEM_DEFAULT_REPORT_PATH);
+    Map<String, CoverageMeasuresBuilder> systemCoverageMeasures = parseReports(systemReports);
+    saveMeasures(project, context, systemCoverageMeasures, SYSTEM_TEST_COVERAGE);
+    
     CxxUtils.LOG.debug("Parsing overall test coverage reports");
     List<File> overallReports = getReports(settings, project.getFileSystem().getBasedir().getPath(),
             OVERALL_REPORT_PATH_KEY, OVERALL_DEFAULT_REPORT_PATH);
@@ -134,6 +143,9 @@ public class CxxCoverageSensor extends CxxReportSensor {
             case IT_TEST_COVERAGE:
               measure = convertToItMeasure(measure);
               break;
+            case SYSTEM_TEST_COVERAGE:
+              measure = convertForSystem(measure);
+              break;                
             case OVERALL_TEST_COVERAGE:
               measure = convertForOverall(measure);
               break;
@@ -193,6 +205,29 @@ public class CxxCoverageSensor extends CxxReportSensor {
 
     return itMeasure;
   }
+
+  private Measure convertForSystem(Measure measure) {
+    Measure itMeasure = null;
+
+    if (CoreMetrics.LINES_TO_COVER.equals(measure.getMetric())) {
+      itMeasure = new Measure(CoreMetrics.SYSTEM_LINES_TO_COVER, measure.getValue());
+    } else if (CoreMetrics.UNCOVERED_LINES.equals(measure.getMetric())) {
+      itMeasure = new Measure(CoreMetrics.SYSTEM_UNCOVERED_LINES, measure.getValue());
+    } else if (CoreMetrics.COVERAGE_LINE_HITS_DATA.equals(measure.getMetric())) {
+      itMeasure = new Measure(CoreMetrics.SYSTEM_COVERAGE_LINE_HITS_DATA, measure.getData());
+    } else if (CoreMetrics.CONDITIONS_TO_COVER.equals(measure.getMetric())) {
+      itMeasure = new Measure(CoreMetrics.SYSTEM_CONDITIONS_TO_COVER, measure.getValue());
+    } else if (CoreMetrics.UNCOVERED_CONDITIONS.equals(measure.getMetric())) {
+      itMeasure = new Measure(CoreMetrics.SYSTEM_UNCOVERED_CONDITIONS, measure.getValue());
+    } else if (CoreMetrics.COVERED_CONDITIONS_BY_LINE.equals(measure.getMetric())) {
+      itMeasure = new Measure(CoreMetrics.SYSTEM_COVERED_CONDITIONS_BY_LINE, measure.getData());
+    } else if (CoreMetrics.CONDITIONS_BY_LINE.equals(measure.getMetric())) {
+      itMeasure = new Measure(CoreMetrics.SYSTEM_CONDITIONS_BY_LINE, measure.getData());
+    }
+
+    return itMeasure;
+  }
+
   
   private boolean fileExist(SensorContext context, org.sonar.api.resources.File file) {
     return context.getResource(file) != null;
