@@ -26,6 +26,7 @@ import org.sonar.api.Extension;
 import org.sonar.api.Properties;
 import org.sonar.api.Property;
 import org.sonar.api.SonarPlugin;
+import org.sonar.plugins.cxx.bullseyecomplexity.CxxBullseyeComplexitySensor;
 import org.sonar.plugins.cxx.coverage.CxxCoverageSensor;
 import org.sonar.plugins.cxx.cppcheck.CxxCppCheckRuleRepository;
 import org.sonar.plugins.cxx.cppcheck.CxxCppCheckSensor;
@@ -129,6 +130,13 @@ import org.sonar.plugins.cxx.xunit.CxxXunitSensor;
       global = false,
       project = true),
     @Property(
+      key = CxxBullseyeComplexitySensor.REPORT_PATH_KEY,
+      defaultValue = "",
+      name = "Path to Bullseye coverage report(s)",
+      description = "Relative to projects' root. Ant patterns are accepted",
+      global = false,
+      project = true), 
+    @Property(
       key = CxxXunitSensor.XSLT_URL_KEY,
       defaultValue = "",
       name = "URL of the xslt transformer",
@@ -166,7 +174,8 @@ public final class CxxPlugin extends SonarPlugin {
     l.add(CxxDefaultProfile.class);
     l.add(CxxCommonRulesEngineProvider.class);
     l.add(CxxExternalRulesSensor.class);
-    l.add(CxxExternalRulesRuleRepository.class);    
+    l.add(CxxExternalRulesRuleRepository.class);
+    l.add(CxxBullseyeComplexitySensor.class);
 
     return l;
   }
