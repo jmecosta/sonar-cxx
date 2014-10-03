@@ -36,7 +36,6 @@ import org.sonar.plugins.cxx.utils.EmptyReportException;
 public class CppcheckParserV1 implements CppcheckParser {
 
   private CxxCppCheckSensor sensor;
-  private boolean parsed = false;
 
   public CppcheckParserV1(CxxCppCheckSensor sensor) {
     this.sensor = sensor;
@@ -54,7 +53,6 @@ public class CppcheckParserV1 implements CppcheckParser {
        * {@inheritDoc}
        */
       public void stream(SMHierarchicCursor rootCursor) throws XMLStreamException {
-        parsed = true;
 
         try {
           rootCursor.advance(); // results
@@ -62,7 +60,6 @@ public class CppcheckParserV1 implements CppcheckParser {
           throw new EmptyReportException();
         }
 
-        int countIssues = 0;
         try {
           SMInputCursor errorCursor = rootCursor.childElementCursor("error"); // error
           while (errorCursor.getNext() != null) {
@@ -72,16 +69,12 @@ public class CppcheckParserV1 implements CppcheckParser {
             String msg = errorCursor.getAttrValue("msg");
 
             if (isInputValid(file, line, id, msg)) {
-              if(sensor.saveUniqueViolation(project, context, CxxCppCheckRuleRepository.KEY, file, line, id, msg)){
-                ++countIssues;
-              }
+              sensor.saveUniqueViolation(project, context, CxxCppCheckRuleRepository.KEY, file, line, id, msg);
             } else {
               CxxUtils.LOG.warn("Skipping invalid violation: '{}'", msg);
             }
           }
-          CxxUtils.LOG.info("CppCheck issues processed = " + countIssues);
         } catch (RuntimeException e) {
-          parsed = false;
           throw new XMLStreamException();
         }
       }
@@ -92,10 +85,6 @@ public class CppcheckParserV1 implements CppcheckParser {
     });
 
     parser.parse(report);
-  }
-
-  public boolean hasParsed() {
-    return parsed;
   }
   
   @Override

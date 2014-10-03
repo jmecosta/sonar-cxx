@@ -29,6 +29,7 @@ import org.sonar.api.profiles.RulesProfile;
 import org.sonar.api.resources.Project;
 import org.sonar.api.rules.RuleFinder;
 import org.sonar.api.scan.filesystem.ModuleFileSystem;
+import org.sonar.plugins.cxx.CxxMetrics;
 import org.sonar.plugins.cxx.utils.CxxReportSensor;
 import org.sonar.plugins.cxx.utils.CxxUtils;
 
@@ -50,7 +51,7 @@ public class CxxCppCheckSensor extends CxxReportSensor {
    */
   public CxxCppCheckSensor(RuleFinder ruleFinder, Settings conf, ModuleFileSystem fs,
       RulesProfile profile) {
-    super(ruleFinder, conf, fs);
+    super(ruleFinder, conf, fs, CxxMetrics.CPPCHECK);
     this.profile = profile;
     parsers.add(new CppcheckParserV2(this));
     parsers.add(new CppcheckParserV1(this));
@@ -79,14 +80,13 @@ public class CxxCppCheckSensor extends CxxReportSensor {
   protected void processReport(final Project project, final SensorContext context, File report)
     throws javax.xml.stream.XMLStreamException {
     boolean parsed = false;
+    
     for (CppcheckParser parser : parsers) {
       try {
         parser.processReport(project, context, report);
-        if (parser.hasParsed()) {
-          CxxUtils.LOG.info("Added report '{}' (parsed by: {})", report, parser);
-          parsed = true;
-          break;
-        }
+        CxxUtils.LOG.info("Added report '{}' (parsed by: {})", report, parser);
+        parsed = true;
+        break;
       } catch (XMLStreamException e) {
         CxxUtils.LOG.trace("Report {} cannot be parsed by {}", report, parser);
       }

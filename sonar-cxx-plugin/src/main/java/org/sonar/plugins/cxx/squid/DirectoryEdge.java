@@ -17,21 +17,43 @@
  * License along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02
  */
-package org.sonar.plugins.cxx.cppcheck;
+package org.sonar.plugins.cxx.squid;
 
-import org.junit.Test;
-import org.sonar.api.platform.ServerFileSystem;
-import org.sonar.api.rules.XMLRuleParser;
+import org.sonar.api.resources.Directory;
+import org.sonar.graph.Edge;
 
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.mock;
-import org.sonar.api.config.Settings;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
-public class CxxCppCheckRuleRepositoryTest {
-  @Test
-  public void createRulesTest() {
-    CxxCppCheckRuleRepository rulerep = new CxxCppCheckRuleRepository(
-        mock(ServerFileSystem.class), new XMLRuleParser(), new Settings());
-    assertEquals(304, rulerep.createRules().size());
+class DirectoryEdge implements Edge<Directory> {
+  private Directory from;
+  private Directory to;
+  private Set<FileEdge> rootEdges;
+
+  public DirectoryEdge(Directory from, Directory to) {
+    this.from = from;
+    this.to = to;
+    this.rootEdges = new HashSet<FileEdge>();
+  }
+
+  public void addRootEdge(FileEdge edge) {
+    rootEdges.add(edge);
+  }
+
+  public Collection<FileEdge> getRootEdges() {
+    return rootEdges;
+  }
+
+  public int getWeight() {
+    return rootEdges.size();
+  }
+
+  public Directory getFrom() {
+    return from;
+  }
+
+  public Directory getTo() {
+    return to;
   }
 }

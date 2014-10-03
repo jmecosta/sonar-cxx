@@ -2668,6 +2668,24 @@
       Repositioning operation performed on a file opened in append mode has no effect.
     </description>
   </rule>
+    <!-- ########### New in cppcheck 1.66 ########### -->
+  <rule>
+    <key>arrayIndexOutOfBoundsCond</key>
+    <configkey>arrayIndexOutOfBoundsCond</configkey>
+    <name>Array index out of bounds</name>
+    <description>
+      The array access using this index may be out of bounds.
+    </description>
+  </rule>
+  <rule>
+    <key>charLiteralWithCharPtrCompare</key>
+    <configkey>charLiteralWithCharPtrCompare</configkey>
+    <name>Char literal compared with pointer</name>
+    <description>
+      Char literal compared with a pointer. Did you intend to dereference it?
+    </description>
+  </rule>
+
 </rules>
 
 

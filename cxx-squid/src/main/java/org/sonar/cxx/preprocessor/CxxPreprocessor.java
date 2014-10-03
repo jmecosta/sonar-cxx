@@ -19,7 +19,10 @@
  */
 package org.sonar.cxx.preprocessor;
 
+import com.google.common.collect.Multimap;
+import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Multimap;
 import com.sonar.sslr.api.AstNode;
 import com.sonar.sslr.api.Preprocessor;
 import com.sonar.sslr.api.PreprocessorAction;
@@ -37,14 +40,7 @@ import com.sonar.sslr.api.Grammar;
 import org.sonar.cxx.lexer.CxxLexer;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-import java.util.Stack;
-import java.util.Map;
+import java.util.*;
 
 import static com.sonar.sslr.api.GenericTokenType.EOF;
 import static com.sonar.sslr.api.GenericTokenType.IDENTIFIER;
@@ -119,6 +115,46 @@ public class CxxPreprocessor extends Preprocessor {
   private SourceCodeProvider codeProvider = new SourceCodeProvider();
   private SquidAstVisitorContext<Grammar> context;
   private ExpressionEvaluator ifExprEvaluator;
+  private Multimap<String, String> includedFiles = HashMultimap.create();
+
+  public static class MissingInclude {
+    private int line;
+    private String directive;
+
+    MissingInclude(int line, String directive) {
+      this.line = line;
+      this.directive = directive;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+      if (this == o) return true;
+      if (o == null || getClass() != o.getClass()) return false;
+
+      MissingInclude that = (MissingInclude) o;
+
+      if (line != that.line) return false;
+      if (directive != null ? !directive.equals(that.directive) : that.directive != null) return false;
+
+      return true;
+    }
+
+    @Override
+    public int hashCode() {
+      int result = line;
+      result = 31 * result + (directive != null ? directive.hashCode() : 0);
+      return result;
+    }
+
+    public String getDirective() {
+      return directive;
+    }
+
+    public int getLine() {
+      return line;
+    }
+  }
+  private Multimap<String, MissingInclude> missingIncludeFiles = HashMultimap.create();
 
   // state which is not shared between files
   private State state = new State(null);
@@ -180,12 +216,20 @@ public class CxxPreprocessor extends Preprocessor {
       for (String include : conf.getForceIncludeFiles()) {
         LOG.debug("parsing force include: '{}'", include);
         if (!include.equals("")) {
-          parseIncludeLine("#include \"" + include + "\"");
+          parseIncludeLine("#include \"" + include + "\"", "sonar.cxx.forceIncludes");
         }
       }
     } finally {
       macros.setHighPrio(false);
     }
+  }
+
+  public Collection<String> getIncludedFiles(File file) {
+    return includedFiles.get(file.getPath());
+  }
+  
+  public Collection<MissingInclude> getMissingIncludeFiles(File file) {
+    return missingIncludeFiles.get(file.getPath());
   }
 
   @Override
@@ -390,9 +434,9 @@ public class CxxPreprocessor extends Preprocessor {
     return new PreprocessorAction(1, Lists.newArrayList(Trivia.createSkippedText(token)), new ArrayList<Token>());
   }
 
-  private void parseIncludeLine(String includeLine) {
+  private void parseIncludeLine(String includeLine, String filename) {
     AstNode includeAst = pplineParser.parse(includeLine);
-    handleIncludeLine(includeAst, includeAst.getToken(), "");
+    handleIncludeLine(includeAst, includeAst.getFirstDescendant(CppGrammar.includeBodyQuoted).getToken(), filename);
   }
 
   PreprocessorAction handleIncludeLine(AstNode ast, Token token, String filename) {
@@ -407,8 +451,17 @@ public class CxxPreprocessor extends Preprocessor {
     //    if it finds relevant preprocessor directives (currently: include's and define's)
 
     File includedFile = findIncludedFile(ast, token, filename);
+
+    File currentFile = this.getFileUnderAnalysis();
+    if (currentFile != null && includedFile != null) {
+      includedFiles.put(currentFile.getPath(), includedFile.getAbsolutePath());
+    }
+
     if (includedFile == null) {
       LOG.warn("[{}:{}]: cannot find the sources for '{}'", new Object[] {filename, token.getLine(), token.getValue()});
+      if (currentFile != null) {
+        missingIncludeFiles.put(currentFile.getPath(), new MissingInclude(token.getLine(), token.getValue()));
+      }
     }
     else if (!analysedFiles.contains(includedFile)) {
       analysedFiles.add(includedFile.getAbsoluteFile());
