@@ -22,8 +22,8 @@ package org.sonar.cxx.checks;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-import org.sonar.api.utils.SonarException;
-import org.sonar.check.Cardinality;
+import org.sonar.api.utils.SonarException; //@todo: deprecated, see http://javadocs.sonarsource.org/4.5.2/apidocs/deprecated-list.html
+import org.sonar.check.Cardinality; //@todo: deprecated, see http://javadocs.sonarsource.org/4.5.2/apidocs/deprecated-list.html
 import org.sonar.check.Priority;
 import org.sonar.check.Rule;
 import org.sonar.check.RuleProperty;
@@ -80,7 +80,7 @@ public class UseCorrectTypeCheck extends SquidCheck<Grammar> {
       try {
         pattern = Pattern.compile(regularExpression, Pattern.DOTALL);
       } catch (RuntimeException e) {
-        throw new SonarException("Unable to compile regular expression: " + regularExpression, e);
+        throw new SonarException("Unable to compile regular expression: " + regularExpression, e); //@todo SonarException has been deprecated, see http://javadocs.sonarsource.org/4.5.2/apidocs/deprecated-list.html
       }
     }
   }

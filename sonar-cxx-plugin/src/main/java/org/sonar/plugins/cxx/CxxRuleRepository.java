@@ -19,28 +19,25 @@
  */
 package org.sonar.plugins.cxx;
 
-import java.util.List;
-
-import org.sonar.api.rules.AnnotationRuleParser;
-import org.sonar.api.rules.Rule;
-import org.sonar.api.rules.RuleRepository;
+import org.sonar.api.server.rule.RulesDefinition;
+import org.sonar.api.server.rule.RulesDefinitionAnnotationLoader;
 import org.sonar.cxx.checks.CheckList;
 
-public class CxxRuleRepository extends RuleRepository {
+public class CxxRuleRepository implements RulesDefinition {
 
   private static final String REPOSITORY_NAME = "c++ SonarQube";
 
-  private final AnnotationRuleParser annotationRuleParser;
+  private final RulesDefinitionAnnotationLoader annotationRuleLoader;
 
-  public CxxRuleRepository(AnnotationRuleParser annotationRuleParser) {
-    super(CheckList.REPOSITORY_KEY, CxxLanguage.KEY);
-    setName(REPOSITORY_NAME);
-    this.annotationRuleParser = annotationRuleParser;
+  public CxxRuleRepository(RulesDefinitionAnnotationLoader annotationRuleLoader) {
+    this.annotationRuleLoader = annotationRuleLoader;
   }
 
   @Override
-  public List<Rule> createRules() {
-    return annotationRuleParser.parse(CheckList.REPOSITORY_KEY, CheckList.getChecks());
+  public void define(Context context) {
+    NewExtendedRepository repository = context.extendRepository(CheckList.REPOSITORY_KEY, CxxLanguage.KEY);//.setName(REPOSITORY_NAME);
+    annotationRuleLoader.load(repository, (Class[]) CheckList.getChecks().toArray());
+    // i18nLoader.load(repository); // @todo?
+    repository.done();
   }
-
 }

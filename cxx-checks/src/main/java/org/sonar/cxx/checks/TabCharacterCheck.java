@@ -23,7 +23,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.List;
 
-import org.sonar.api.utils.SonarException;
+import org.sonar.api.utils.SonarException; //@todo: deprecated, see http://javadocs.sonarsource.org/4.5.2/apidocs/deprecated-list.html
 import org.sonar.check.Priority;
 import org.sonar.check.Rule;
 import org.sonar.cxx.visitors.CxxCharsetAwareVisitor;
@@ -53,7 +53,7 @@ public class TabCharacterCheck extends SquidCheck<Grammar> implements CxxCharset
     try {
       lines = Files.readLines(getContext().getFile(), charset);
     } catch (IOException e) {
-      throw new SonarException(e);
+      throw new SonarException(e); //@todo SonarException has been deprecated, see http://javadocs.sonarsource.org/4.5.2/apidocs/deprecated-list.html
     }
     for (String line : lines) {
       if (line.contains("\t")) {

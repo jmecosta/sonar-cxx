@@ -22,13 +22,13 @@ package org.sonar.plugins.cxx;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.sonar.api.web.CodeColorizerFormat;
-import org.sonar.colorizer.CDocTokenizer;
-import org.sonar.colorizer.CppDocTokenizer;
-import org.sonar.colorizer.KeywordsTokenizer;
-import org.sonar.colorizer.LiteralTokenizer;
-import org.sonar.colorizer.RegexpTokenizer;
-import org.sonar.colorizer.Tokenizer;
+import org.sonar.api.web.CodeColorizerFormat; //@todo: deprecated, see http://javadocs.sonarsource.org/4.5.2/apidocs/deprecated-list.html
+import org.sonar.colorizer.CDocTokenizer; //@todo: deprecated, see http://javadocs.sonarsource.org/4.5.2/apidocs/deprecated-list.html
+import org.sonar.colorizer.CppDocTokenizer; //@todo: deprecated, see http://javadocs.sonarsource.org/4.5.2/apidocs/deprecated-list.html
+import org.sonar.colorizer.KeywordsTokenizer; //@todo: deprecated, see http://javadocs.sonarsource.org/4.5.2/apidocs/deprecated-list.html
+import org.sonar.colorizer.LiteralTokenizer; //@todo: deprecated, see http://javadocs.sonarsource.org/4.5.2/apidocs/deprecated-list.html
+import org.sonar.colorizer.RegexpTokenizer; //@todo: deprecated, see http://javadocs.sonarsource.org/4.5.2/apidocs/deprecated-list.html
+import org.sonar.colorizer.Tokenizer; //@todo: deprecated, see http://javadocs.sonarsource.org/4.5.2/apidocs/deprecated-list.html
 import org.sonar.cxx.api.CxxKeyword;
 
 /**

@@ -19,7 +19,7 @@
  */
 package org.sonar.cxx.checks;
 
-import org.sonar.check.Cardinality;
+import org.sonar.check.Cardinality; //@todo: deprecated, see http://javadocs.sonarsource.org/4.5.2/apidocs/deprecated-list.html
 import org.sonar.check.Priority;
 import org.sonar.check.Rule;
 import org.sonar.check.RuleProperty;
