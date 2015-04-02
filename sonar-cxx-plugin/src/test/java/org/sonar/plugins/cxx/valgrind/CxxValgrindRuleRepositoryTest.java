@@ -72,7 +72,7 @@ public class CxxValgrindRuleRepositoryTest {
     assertEquals(repo.rules().size(), 17);
   }
 
-  @Test(expected = org.sonar.api.utils.SonarException.class) //@todo SonarException has been deprecated, see http://javadocs.sonarsource.org/4.5.2/apidocs/deprecated-list.html
+  @Test //@todo check if new behaviour is ok: Exception is replaced by error message in LOG file
   public void containsInvalidFormatInExtensionRulesNewFormat() {
     ServerFileSystem filesystem = mock(ServerFileSystem.class);
     ArrayList<File> extensionFile = new ArrayList<File>();
@@ -83,10 +83,10 @@ public class CxxValgrindRuleRepositoryTest {
     RulesDefinition.Context context = new RulesDefinition.Context();
     def.define(context);
     RulesDefinition.Repository repo = context.repository(CxxValgrindRuleRepository.KEY);
-    repo.rules();
+    assertEquals(repo.rules().size(), 16);
   }
 
-  @Test(expected = org.sonar.api.utils.SonarException.class) //@todo SonarException has been deprecated, see http://javadocs.sonarsource.org/4.5.2/apidocs/deprecated-list.html
+  @Test //@todo check if new behaviour is ok: Exception is replaced by error message in LOG file
   public void containsEmptyExtensionRulesFile() {
     ServerFileSystem filesystem = mock(ServerFileSystem.class);
     ArrayList<File> extensionFile = new ArrayList<File>();
@@ -97,6 +97,6 @@ public class CxxValgrindRuleRepositoryTest {
     RulesDefinition.Context context = new RulesDefinition.Context();
     def.define(context);
     RulesDefinition.Repository repo = context.repository(CxxValgrindRuleRepository.KEY);
-    repo.rules();
+    assertEquals(repo.rules().size(), 16);
   }
 }

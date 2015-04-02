@@ -35,8 +35,8 @@ public class CxxRuleRepository implements RulesDefinition {
 
   @Override
   public void define(Context context) {
-    NewExtendedRepository repository = context.extendRepository(CheckList.REPOSITORY_KEY, CxxLanguage.KEY);//.setName(REPOSITORY_NAME);
-    annotationRuleLoader.load(repository, (Class[]) CheckList.getChecks().toArray());
+    NewRepository repository = context.createRepository(CheckList.REPOSITORY_KEY, CxxLanguage.KEY).setName(REPOSITORY_NAME);
+    annotationRuleLoader.load(repository, CheckList.getChecks().toArray(new Class[0]));
     // i18nLoader.load(repository); // @todo?
     repository.done();
   }

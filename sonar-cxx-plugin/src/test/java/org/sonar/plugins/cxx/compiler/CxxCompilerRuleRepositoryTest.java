@@ -39,7 +39,7 @@ public class CxxCompilerRuleRepositoryTest {
     RulesDefinition.Context context = new RulesDefinition.Context();
     def.define(context);
 
-    RulesDefinition.Repository repo = context.repository(CxxCompilerGccRuleRepository.KEY);
+    RulesDefinition.Repository repo = context.repository(CxxCompilerVcRuleRepository.KEY);
     assertThat(repo.rules()).hasSize(693);
   }
 
