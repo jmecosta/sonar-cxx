@@ -22,6 +22,8 @@ package org.sonar.plugins.cxx;
 import static org.fest.assertions.Assertions.assertThat;
 
 import org.junit.Test;
+import org.sonar.api.server.rule.RulesDefinition;
+import org.sonar.api.server.rule.RulesDefinitionAnnotationLoader;
 import org.sonar.commonrules.api.CommonRulesRepository;
 
 /**
@@ -33,12 +35,24 @@ public class CxxCommonRulesEngineTest {
   @Test
   public void provide_extensions() {
     CxxCommonRulesEngine engine = new CxxCommonRulesEngine();
+    
+    RulesDefinitionAnnotationLoader loader = new RulesDefinitionAnnotationLoader();
+    CxxRuleRepository def = new CxxRuleRepository(loader);
+    RulesDefinition.Context context = new RulesDefinition.Context();
+    def.define(context);
+    
     assertThat(engine.provide()).isNotEmpty();
   }
 
   @Test
   public void enable_common_rules() {
     CxxCommonRulesEngine engine = new CxxCommonRulesEngine();
+    
+    RulesDefinitionAnnotationLoader loader = new RulesDefinitionAnnotationLoader();
+    CxxRuleRepository def = new CxxRuleRepository(loader);
+    RulesDefinition.Context context = new RulesDefinition.Context();
+    def.define(context);    
+   
     CommonRulesRepository repo = engine.newRepository();
     assertThat(repo.rules()).hasSize(6);
     assertThat(repo.rule(CommonRulesRepository.RULE_INSUFFICIENT_COMMENT_DENSITY)).isNotNull();
