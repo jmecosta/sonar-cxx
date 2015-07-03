@@ -71,37 +71,35 @@ public class CxxReportSensorTest {
     new CxxReportSensorImpl(settings, fs, reactor);
   }
 
-
   @Test
-  public void getReports_shouldFindSomethingIfThere() {
-    List<File> reports = sensor.getReports(settings, baseDir.getPath(),
-        "", VALID_REPORT_PATH);
-    assertFound(reports);
-  }
-
-  @Test
-  public void getReports_shouldFindNothingIfNotThere() {
-    List<File> reports = sensor.getReports(new Settings(), baseDir.getPath(),
-        "", INVALID_REPORT_PATH);
-    assertNotFound(reports);
-  }
-
-  @Test
-  public void getReports_shouldUseConfigurationWithHigherPriority() {
-    // we'll detect this condition by passing something not existing as config property
-    // and something existing as default. The result is 'found nothing' because the
-    // config has been used
+  public void getReports_shouldFindNothingIfNoKey() {
     settings.setProperty(REPORT_PATH_PROPERTY_KEY, INVALID_REPORT_PATH);
-
     List<File> reports = sensor.getReports(settings, baseDir.getPath(),
-        REPORT_PATH_PROPERTY_KEY, VALID_REPORT_PATH);
+      "");
     assertNotFound(reports);
   }
 
   @Test
-  public void getReports_shouldFallbackToDefaultIfNothingConfigured() {
+  public void getReports_shouldFindNothingIfNoPath() {
+    settings.setProperty(REPORT_PATH_PROPERTY_KEY, "");
     List<File> reports = sensor.getReports(settings, baseDir.getPath(),
-        REPORT_PATH_PROPERTY_KEY, VALID_REPORT_PATH);
+      REPORT_PATH_PROPERTY_KEY);
+    assertNotFound(reports);
+  }
+
+  @Test
+  public void getReports_shouldFindNothingIfInvalidPath() {
+    settings.setProperty(REPORT_PATH_PROPERTY_KEY, INVALID_REPORT_PATH);
+    List<File> reports = sensor.getReports(settings, baseDir.getPath(),
+      REPORT_PATH_PROPERTY_KEY);
+    assertNotFound(reports);
+  }
+
+  @Test
+  public void getReports_shouldFindSomething() {
+    settings.setProperty(REPORT_PATH_PROPERTY_KEY, VALID_REPORT_PATH);
+    List<File> reports = sensor.getReports(settings, baseDir.getPath(),
+      REPORT_PATH_PROPERTY_KEY);
     assertFound(reports);
   }
 

@@ -92,7 +92,8 @@ public abstract class CxxReportSensor implements Sensor {
    * {@inheritDoc}
    */
   public boolean shouldExecuteOnProject(Project project) {
-    return fs.hasFiles(fs.predicates().hasLanguage(CxxLanguage.KEY));
+    return fs.hasFiles(fs.predicates().hasLanguage(CxxLanguage.KEY))
+      && conf.hasKey(reportPathKey());
   }
   
   /**
@@ -101,10 +102,9 @@ public abstract class CxxReportSensor implements Sensor {
   public void analyse(Project project, SensorContext context) {
     if (!CxxUtils.isReactorProject(project)) {
       try {
-      List<File> reports = getReports(conf, reactor.getRoot().getBaseDir().getCanonicalPath(),
-          reportPathKey(), defaultReportPath());
+      List<File> reports = getReports(conf, reactor.getRoot().getBaseDir().getCanonicalPath(), reportPathKey());
         if (reports.isEmpty()) {
-          reports = getReports(conf, fs.baseDir().getPath(), reportPathKey(), defaultReportPath());
+          reports = getReports(conf, fs.baseDir().getPath(), reportPathKey());
         }
         violationsCount = 0;
 
@@ -149,29 +149,40 @@ public abstract class CxxReportSensor implements Sensor {
   }
 
   public static List<File> getReports(Settings conf,
-      String baseDirPath,
-      String reportPathPropertyKey,
-      String defaultReportPath) {
+    String baseDirPath,
+    String reportPathPropertyKey) {
     String reportPath = conf.getString(reportPathPropertyKey);
-    if (reportPath == null) {
-      reportPath = defaultReportPath;
-    }
-    reportPath = FilenameUtils.normalize(reportPath);
-
-    CxxUtils.LOG.debug("Using pattern '{}' to find reports", reportPath);
-
-    DirectoryScanner scanner = new DirectoryScanner();
-    String[] includes = new String[1];
-    includes[0] = reportPath;
-    scanner.setIncludes(includes);
-    scanner.setBasedir(new File(baseDirPath));
-    scanner.scan();
-    String[] relPaths = scanner.getIncludedFiles();
-
     List<File> reports = new ArrayList<File>();
-    for (String relPath : relPaths) {
-      String path = CxxUtils.normalizePath(new File(baseDirPath, relPath).getAbsolutePath());      
-      reports.add(new File(path));
+    if (reportPath != null && !reportPath.isEmpty()) {
+      reportPath = FilenameUtils.normalize(reportPath);
+      CxxUtils.LOG.debug("Using pattern '{}' to find reports", reportPath);
+
+      DirectoryScanner scanner = new DirectoryScanner();
+      String[] includes = new String[1];
+      includes[0] = reportPath;
+      scanner.setIncludes(includes);
+      scanner.setBasedir(new File(baseDirPath));
+      scanner.scan();
+      String[] relPaths = scanner.getIncludedFiles();
+
+      for (String relPath : relPaths) {
+        try {
+          String path = CxxUtils.normalizePath(new File(baseDirPath, relPath).getAbsolutePath());
+          File reportFile = new File(path);
+          if (reportFile.exists()) {
+            reports.add(reportFile);
+          } else {
+            CxxUtils.LOG.error("Can't read report '{}'", reportPathPropertyKey);
+          }
+        } catch (SecurityException e) {
+          CxxUtils.LOG.error("Read access to report '{}' denied", reportPathPropertyKey);
+        }
+      }
+      if (reports.isEmpty()) {
+        CxxUtils.LOG.warn("Can't find a report for '{0}={1}'", reportPathPropertyKey, reportPath);
+      }
+    } else {
+      CxxUtils.LOG.error("Undefined report path value for key '{}'", reportPathPropertyKey);
     }
 
     return reports;
@@ -272,10 +283,6 @@ public abstract class CxxReportSensor implements Sensor {
   }
 
   protected String reportPathKey() {
-    return "";
-  }
-
-  protected String defaultReportPath() {
     return "";
   }
 }
