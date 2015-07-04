@@ -102,19 +102,19 @@ public abstract class CxxReportSensor implements Sensor {
   public void analyse(Project project, SensorContext context) {
     if (!CxxUtils.isReactorProject(project)) {
       try {
-      List<File> reports = getReports(conf, reactor.getRoot().getBaseDir().getCanonicalPath(), reportPathKey());
-        if (reports.isEmpty()) {
-          reports = getReports(conf, fs.baseDir().getPath(), reportPathKey());
-        }
+        List<File> reports = getReports(conf,
+          reactor.getRoot().getBaseDir().getCanonicalPath(),
+          fs.baseDir().getPath(),
+          reportPathKey());
         violationsCount = 0;
 
         for (File report : reports) {
           CxxUtils.LOG.info("Processing report '{}'", report);
-        try {
+          try {
             int prevViolationsCount = violationsCount;
             processReport(project, context, report);
-          CxxUtils.LOG.info("{} processed = {}", metric == null ? "Issues" : metric.getName(),
-                            violationsCount - prevViolationsCount);
+            CxxUtils.LOG.info("{} processed = {}", metric == null ? "Issues" : metric.getName(),
+              violationsCount - prevViolationsCount);
           } catch (EmptyReportException e) {
             CxxUtils.LOG.warn("The report '{}' seems to be empty, ignoring.", report);
           }
@@ -126,12 +126,12 @@ public abstract class CxxReportSensor implements Sensor {
           context.saveMeasure(measure);
         }
       } catch (Exception e) {
-      String msg = new StringBuilder()
+        String msg = new StringBuilder()
           .append("Cannot feed the data into sonar, details: '")
           .append(e)
           .append("'")
           .toString();
-      throw new SonarException(msg, e); //@todo SonarException has been deprecated, see http://javadocs.sonarsource.org/4.5.2/apidocs/deprecated-list.html
+        throw new SonarException(msg, e); //@todo SonarException has been deprecated, see http://javadocs.sonarsource.org/4.5.2/apidocs/deprecated-list.html
       }
     }
   }
@@ -149,7 +149,8 @@ public abstract class CxxReportSensor implements Sensor {
   }
 
   public static List<File> getReports(Settings conf,
-    String baseDirPath,
+    String baseDirPath1,
+    String baseDirPath2,
     String reportPathPropertyKey) {
     String reportPath = conf.getString(reportPathPropertyKey);
     List<File> reports = new ArrayList<File>();
@@ -161,10 +162,26 @@ public abstract class CxxReportSensor implements Sensor {
       String[] includes = new String[1];
       includes[0] = reportPath;
       scanner.setIncludes(includes);
+      String baseDirPath = baseDirPath1;
       scanner.setBasedir(new File(baseDirPath));
-      scanner.scan();
-      String[] relPaths = scanner.getIncludedFiles();
-
+      String[] relPaths = new String[0];
+      try {
+        scanner.scan();
+        relPaths = scanner.getIncludedFiles();
+      } catch (IllegalStateException e) {
+        CxxUtils.LOG.error("Invalid report baseDir '{}'", baseDirPath);
+      }
+      if (relPaths.length < 1 && !baseDirPath2.isEmpty()) {
+        baseDirPath = baseDirPath2;
+        scanner.setBasedir(new File(baseDirPath));
+        try {
+          scanner.scan();
+          relPaths = scanner.getIncludedFiles();
+        } catch (IllegalStateException e) {
+          CxxUtils.LOG.error("Invalid report baseDir '{}'", baseDirPath);
+        }
+      }
+      
       for (String relPath : relPaths) {
         try {
           String path = CxxUtils.normalizePath(new File(baseDirPath, relPath).getAbsolutePath());

@@ -74,7 +74,7 @@ public class CxxReportSensorTest {
   @Test
   public void getReports_shouldFindNothingIfNoKey() {
     settings.setProperty(REPORT_PATH_PROPERTY_KEY, INVALID_REPORT_PATH);
-    List<File> reports = sensor.getReports(settings, baseDir.getPath(),
+    List<File> reports = sensor.getReports(settings, baseDir.getPath(), "",
       "");
     assertNotFound(reports);
   }
@@ -82,7 +82,7 @@ public class CxxReportSensorTest {
   @Test
   public void getReports_shouldFindNothingIfNoPath() {
     settings.setProperty(REPORT_PATH_PROPERTY_KEY, "");
-    List<File> reports = sensor.getReports(settings, baseDir.getPath(),
+    List<File> reports = sensor.getReports(settings, baseDir.getPath(), "",
       REPORT_PATH_PROPERTY_KEY);
     assertNotFound(reports);
   }
@@ -90,19 +90,27 @@ public class CxxReportSensorTest {
   @Test
   public void getReports_shouldFindNothingIfInvalidPath() {
     settings.setProperty(REPORT_PATH_PROPERTY_KEY, INVALID_REPORT_PATH);
-    List<File> reports = sensor.getReports(settings, baseDir.getPath(),
+    List<File> reports = sensor.getReports(settings, baseDir.getPath(), "",
       REPORT_PATH_PROPERTY_KEY);
     assertNotFound(reports);
   }
 
   @Test
-  public void getReports_shouldFindSomething() {
+  public void getReports_shouldFindSomethingBaseDir1() {
     settings.setProperty(REPORT_PATH_PROPERTY_KEY, VALID_REPORT_PATH);
-    List<File> reports = sensor.getReports(settings, baseDir.getPath(),
+    List<File> reports = sensor.getReports(settings, baseDir.getPath(), "",
       REPORT_PATH_PROPERTY_KEY);
     assertFound(reports);
   }
 
+  @Test
+  public void getReports_shouldFindSomethingBaseDir2() {
+    settings.setProperty(REPORT_PATH_PROPERTY_KEY, VALID_REPORT_PATH);
+    List<File> reports = sensor.getReports(settings, baseDir.getPath()+"Invalid", baseDir.getPath(),
+      REPORT_PATH_PROPERTY_KEY);
+    assertFound(reports);
+  }
+  
   @Test
   public void savesACorrectLineLevelViolation() {
     // assert(sensor.saveViolation(??, ??, rulerepokey, "existingfile",

@@ -85,30 +85,30 @@ public class CxxCoverageSensor extends CxxReportSensor {
 
     if (conf.hasKey(REPORT_PATH_KEY)) {
       CxxUtils.LOG.debug("Parsing coverage reports");
-      List<File> reports = getReports(conf, reactor.getRoot().getBaseDir().getAbsolutePath(), REPORT_PATH_KEY);
-      if (reports.isEmpty()) {
-        reports = getReports(conf, fs.baseDir().getPath(), REPORT_PATH_KEY);
-      }
+      List<File> reports = getReports(conf,
+        reactor.getRoot().getBaseDir().getAbsolutePath(),
+        fs.baseDir().getPath(),
+        REPORT_PATH_KEY);
       coverageMeasures = processReports(project, context, reports);
       saveMeasures(project, context, coverageMeasures, CoverageType.UT_COVERAGE);
     }
 
     if (conf.hasKey(IT_REPORT_PATH_KEY)) {
       CxxUtils.LOG.debug("Parsing integration test coverage reports");
-      List<File> itReports = getReports(conf, reactor.getRoot().getBaseDir().getAbsolutePath(), IT_REPORT_PATH_KEY);
-      if (itReports.isEmpty()) {
-        itReports = getReports(conf, fs.baseDir().getPath(), IT_REPORT_PATH_KEY);
-      }
+      List<File> itReports = getReports(conf,
+        reactor.getRoot().getBaseDir().getAbsolutePath(),
+        fs.baseDir().getPath(),
+        IT_REPORT_PATH_KEY);
       itCoverageMeasures = processReports(project, context, itReports);
       saveMeasures(project, context, itCoverageMeasures, CoverageType.IT_COVERAGE);
     }
 
     if (conf.hasKey(OVERALL_REPORT_PATH_KEY)) {
       CxxUtils.LOG.debug("Parsing overall test coverage reports");
-      List<File> overallReports = getReports(conf, reactor.getRoot().getBaseDir().getAbsolutePath(), OVERALL_REPORT_PATH_KEY);
-      if (overallReports.isEmpty()) {
-        overallReports = getReports(conf, fs.baseDir().getPath(), OVERALL_REPORT_PATH_KEY);
-      }
+      List<File> overallReports = getReports(conf,
+        reactor.getRoot().getBaseDir().getAbsolutePath(),
+        fs.baseDir().getPath(),
+        OVERALL_REPORT_PATH_KEY);
       overallCoverageMeasures = processReports(project, context, overallReports);
       saveMeasures(project, context, overallCoverageMeasures, CoverageType.OVERALL_COVERAGE);
     }

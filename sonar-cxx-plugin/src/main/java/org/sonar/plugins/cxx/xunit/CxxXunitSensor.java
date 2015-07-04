@@ -132,7 +132,7 @@ public class CxxXunitSensor extends CxxReportSensor {
   @Override
   public void analyse(Project project, SensorContext context) {
     try{
-      List<File> reports = getReports(conf, fs.baseDir().getPath(), REPORT_PATH_KEY);
+      List<File> reports = getReports(conf, fs.baseDir().getPath(), "", REPORT_PATH_KEY);
       if (!reports.isEmpty()) {
         XunitReportParser parserHandler = new XunitReportParser();
         StaxParser parser = new StaxParser(parserHandler, false);
