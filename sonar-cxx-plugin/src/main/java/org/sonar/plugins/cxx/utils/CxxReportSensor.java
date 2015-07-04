@@ -179,7 +179,7 @@ public abstract class CxxReportSensor implements Sensor {
         }
       }
       if (reports.isEmpty()) {
-        CxxUtils.LOG.warn("Can't find a report for '{0}={1}'", reportPathPropertyKey, reportPath);
+        CxxUtils.LOG.warn("Can't find a report for '{}={}'", reportPathPropertyKey, reportPath);
       }
     } else {
       CxxUtils.LOG.error("Undefined report path value for key '{}'", reportPathPropertyKey);
