@@ -260,6 +260,7 @@
           <version>2.16</version>
         <configuration>
           <surefire.useFile>false</surefire.useFile>
+          <useFile>false</useFile>
         </configuration>          
         </plugin>
       </plugins>
