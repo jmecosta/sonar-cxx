@@ -259,8 +259,7 @@
           <artifactId>maven-surefire-plugin</artifactId>
           <version>2.16</version>
         <configuration>
-          <disableXmlReport>true</disableXmlReport>
-          <useFile>false</useFile>
+          <surefire.useFile>false</surefire.useFile>
         </configuration>          
         </plugin>
       </plugins>
