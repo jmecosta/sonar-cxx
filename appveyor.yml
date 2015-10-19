@@ -34,5 +34,5 @@ cache:
 artifacts:
   - path: 'cxx-squid\target\**\*.*'
     name: cxx-squid.zip
-after_build:
+on_failure:
   - ps: Get-ChildItem cxx-squid\target\surefire-reports\*.txt | % { Push-AppveyorArtifact $_.FullName -FileName $_.Name }
