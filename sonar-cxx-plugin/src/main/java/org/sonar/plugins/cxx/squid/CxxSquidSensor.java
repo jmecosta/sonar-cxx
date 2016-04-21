@@ -137,7 +137,7 @@ public final class CxxSquidSensor implements Sensor {
     save(squidSourceFiles);
   }
 
-  <P extends Perspective<?>> P perspective(Class<P> clazz, @Nullable InputFile file) {
+  <P extends Perspective> P perspective(Class<P> clazz, @Nullable InputFile file) {
     if (file == null) {
       throw new IllegalArgumentException("Cannot get " + clazz.getCanonicalName() + "for a null file");
     }
