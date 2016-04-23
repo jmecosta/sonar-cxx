@@ -24,7 +24,6 @@ import java.io.FileReader;
 import java.io.InputStream;
 import java.io.StringReader;
 
-import org.apache.commons.lang.StringUtils;
 import org.sonar.api.config.Settings;
 import org.sonar.api.platform.ServerFileSystem;
 import org.sonar.api.server.rule.RulesDefinition;
@@ -76,7 +75,7 @@ public abstract class CxxAbstractRuleRepository implements RulesDefinition {
     }
 
     String customRules = settings.getString(this.customRepositoryKey);
-    if (StringUtils.isNotBlank(customRules)) {
+    if (customRules != null && !"".equals(customRules)) {
       xmlRuleLoader.load(repository, new StringReader(customRules));
     }
 
